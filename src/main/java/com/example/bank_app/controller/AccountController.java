@@ -1,5 +1,6 @@
 package com.example.bank_app.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.HttpStatus;
@@ -58,5 +59,20 @@ Double amount = request.get("amount");
 
     
 }
+
+    //Withdraw REST API
+    @PutMapping("/{id}/withdraw")
+    public ResponseEntity<AccountDto> withdraw(@PathVariable Long id, @RequestBody Map<String, Double> request) {
+        Double amount = request.get("amount");
+        AccountDto accountDto = accountService.withdraw(id, amount);
+        return ResponseEntity.ok(accountDto);
+    }
+
+    //Get All Accounts REST API
+    @GetMapping
+    public ResponseEntity<List<AccountDto>> getAllAccounts() {
+        List<AccountDto> accounts = accountService.getAllAccounts();
+        return ResponseEntity.ok(accounts);
+    }
 }
 

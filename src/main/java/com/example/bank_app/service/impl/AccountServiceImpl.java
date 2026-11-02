@@ -1,6 +1,8 @@
 package com.example.bank_app.service.impl;
 
 import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -70,4 +72,13 @@ public class AccountServiceImpl implements AccountService {
 
 
 }
+
+    @Override
+    public List<AccountDto> getAllAccounts() {
+
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream().map((account) -> AccountMapper.mapToAccountDto(account)).collect(Collectors.toList());
+        
+    }
+
 }
