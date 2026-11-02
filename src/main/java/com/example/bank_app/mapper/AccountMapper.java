@@ -25,8 +25,8 @@ public class AccountMapper {
     }
 
     public static AccountDto mapToAccountDto(Account savedAccount) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'mapToAccountDto'");
+        
+           return mapAccountDto(savedAccount);
     }
 
 }
