@@ -128,7 +128,12 @@ public class HomeController {
         try {
             bankingService.transfer(form.getFromAccount(), form.getToAccount(),
                     form.getAmount(), form.isSimulateFailure());
-            redirectAttributes.addFlashAttribute("success", "Transfer completed successfully.");
+            if (form.isSimulateFailure()) {
+                redirectAttributes.addFlashAttribute("error",
+                        "Simulated transfer failure; balances were not changed.");
+            } else {
+                redirectAttributes.addFlashAttribute("success", "Transfer completed successfully.");
+            }
         } catch (IllegalArgumentException exception) {
             redirectAttributes.addFlashAttribute("error", exception.getMessage());
         }
@@ -158,7 +163,7 @@ public class HomeController {
         BigDecimal totalSent = transactions.stream()
                 .filter(transaction -> transaction.getStatus() == Transaction.Status.SUCCESS
                         && accountNumber.equals(transaction.getFromAccount()))
-                .map(transaction -> transaction.getAmount().add(transaction.getFee()))
+                .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         model.addAttribute("account", account);

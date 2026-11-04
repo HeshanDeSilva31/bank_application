@@ -14,7 +14,6 @@ import com.example.bank_app.repository.TransactionRepository;
 @Service
 public class BankingService {
     private static final String BANK_ACCOUNT = "999999";
-    private static final BigDecimal TRANSFER_FEE_RATE = new BigDecimal("0.01");
     private static final BigDecimal ZERO = new BigDecimal("0.00");
 
     private final AccountRepository accountRepository;
@@ -81,25 +80,19 @@ public class BankingService {
             throw new IllegalArgumentException("Transfers must be between accounts.");
         }
 
-        BigDecimal fee = value.multiply(TRANSFER_FEE_RATE).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal totalDebit = value.add(fee);
-        ensureSufficientBalance(sender, totalDebit);
+        ensureSufficientBalance(sender, value);
         if (simulateFailure) {
-            transactionRepository.save(new Transaction(fromAccount, toAccount, value, fee,
+            transactionRepository.save(new Transaction(fromAccount, toAccount, value, ZERO,
                     Transaction.Status.FAILED, "Simulated failure; balances were not changed"));
             return;
         }
 
-        Account bank = accountRepository.findByAccountNumber(BANK_ACCOUNT)
-                .orElseGet(() -> new Account(BANK_ACCOUNT, "Bank", "bank@system.local", ZERO.doubleValue()));
-        sender.setBalance(balanceOf(sender).subtract(totalDebit).doubleValue());
+        sender.setBalance(balanceOf(sender).subtract(value).doubleValue());
         receiver.setBalance(balanceOf(receiver).add(value).doubleValue());
-        bank.setBalance(balanceOf(bank).add(fee).doubleValue());
         accountRepository.save(sender);
         accountRepository.save(receiver);
-        accountRepository.save(bank);
-        transactionRepository.save(new Transaction(fromAccount, toAccount, value, fee,
-                Transaction.Status.SUCCESS, "Transfer completed; fee: LKR " + fee));
+        transactionRepository.save(new Transaction(fromAccount, toAccount, value, ZERO,
+                Transaction.Status.SUCCESS, "Transfer completed"));
     }
 
     private Account getAccount(String accountNumber) {
