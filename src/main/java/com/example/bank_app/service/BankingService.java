@@ -24,7 +24,7 @@ public class BankingService {
         this.transactionRepository = transactionRepository;
     }
 
-    @Transactional
+    @Transactional 
     public Account addAccount(String fullName, String email, String accountNumber, BigDecimal balance) {
         if (fullName == null || fullName.isBlank()) {
             throw new IllegalArgumentException("Full name is required.");
